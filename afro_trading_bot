@@ -1,1 +1,29 @@
+# Telegram
+BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
+ADMIN_TELEGRAM_ID=987654321
 
+# Database
+DATABASE_URL=postgresql+asyncpg://sundog:sundog@postgres:5432/sundog
+DATABASE_SYNC_URL=postgresql://sundog:sundog@postgres:5432/sundog
+
+# Redis (for RQ)
+REDIS_URL=redis://redis:6379/0
+
+# TRON
+TRON_NETWORK=nile  # or 'mainnet'
+TRON_FULLNODE=https://api.nileex.io
+TRON_SOLIDITY=https://api.nileex.io
+TRON_EVENTSERVER=https://api.nileex.io
+
+# Key Management (dev only!)
+# ⚠️ NEVER use LOCAL_PRIVATE_KEY in production.
+# For prod, set KEY_MANAGER=aws_kms and configure AWS_KMS_KEY_ID, etc.
+KEY_MANAGER=local
+LOCAL_PRIVATE_KEY=  # leave blank — auto-generated on first run (testnet only)
+
+# Worker
+WORKER_CONCURRENCY=2
+
+# API
+API_HOST=0.0.0.0
+API_PORT=8000
