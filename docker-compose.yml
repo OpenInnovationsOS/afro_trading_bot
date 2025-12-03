@@ -1,62 +1,29 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: sundog
-      POSTGRES_PASSWORD: sundog
-      POSTGRES_DB: sundog
-    volumes:
-      - pg/var/lib/postgresql/data
-    ports:
-      - "5432"
+  bot:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379"
-
-  bot:
-    build:
-      context: .
-      dockerfile: Dockerfile.bot
-    env_file: .env
-    depends_on:
-      - postgres
-      - redis
-    command: python -m bot.main
-
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    env_file: .env
-    depends_on:
-      - postgres
-      - redis
-    command: python -m workers.main
-
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile.api
-    env_file: .env
-    ports:
-      - "8000:8000"
-    depends_on:
-      - postgres
-    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
-
-  pgadmin:
-    image: dpage/pgadmin4
+    command: redis-server --requirepass ${REDIS_PASSWORD:-}
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@sundog
-      PGADMIN_DEFAULT_PASSWORD: sundog
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     ports:
-      - "5050:80"
-    depends_on:
-      - postgres
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
 
 volumes:
-  pg
+  redis-data:
