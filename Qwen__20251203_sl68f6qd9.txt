@@ -1,0 +1,69 @@
+sundog-clone/
+├── .env.example
+├── .gitignore
+├── README.md
+├── docker-compose.yml
+├── docker-compose.prod.yml
+├── Makefile
+├── openapi.yaml
+├── docs/
+│   └── architecture.mmd
+├── bot/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── handlers/
+│   │   ├── __init__.py
+│   │   ├── start.py
+│   │   ├── buy.py
+│   │   ├── balance.py
+│   │   └── wallet.py
+│   └── session.py
+├── lib/
+│   ├── __init__.py
+│   ├── tron/
+│   │   ├── __init__.py
+│   │   ├── client.py
+│   │   ├── router.py
+│   │   ├── tokens.py
+│   │   └── quotes.py
+│   └── security/
+│       ├── __init__.py
+│       ├── key_manager.py
+│       └── local_key_manager.py
+├── db/
+│   ├── __init__.py
+│   ├── base.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── user.py
+│   │   ├── trade.py
+│   │   └── audit_log.py
+│   ├── session.py
+│   └── migrations/
+│       ├── env.py
+│       └── versions/
+├── workers/
+│   ├── __init__.py
+│   ├── queue.py
+│   ├── jobs/
+│   │   ├── __init__.py
+│   │   └── execute_trade.py
+│   └── signing.py
+├── api/
+│   ├── __init__.py
+│   ├── main.py
+│   └── routes/
+│       ├── health.py
+│       └── trades.py
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_tron_client.py
+│   ├── test_quotes.py
+│   └── smoke_test.py
+├── Dockerfile.bot
+├── Dockerfile.worker
+├── Dockerfile.api
+├── requirements.txt
+├── requirements-dev.txt
+└── alembic.ini
