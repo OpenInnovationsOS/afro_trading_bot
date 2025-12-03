@@ -1,0 +1,64 @@
+name: Deploy Afro Trading Bot
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run smoke test
+        run: |
+          python -m pytest tests/smoke_test.py --tb=short
+
+      - name: Create .env file
+        run: |
+          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
+          echo "TRON_NETWORK=${{ vars.TRON_NETWORK }}" >> .env
+          echo "LOCAL_PRIVATE_KEY=${{ secrets.LOCAL_PRIVATE_KEY }}" >> .env
+          echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
+          echo "LOG_LEVEL=INFO" >> .env
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          rsync -avz --exclude='venv' --exclude='.git' --exclude='.env' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/afro_trading_bot/
+
+      - name: SSH into server and restart bot
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+            cd /home/${{ secrets.SERVER_USER }}/afro_trading_bot &&
+            sudo apt update &&
+            sudo apt install -y docker.io docker-compose &&
+            docker-compose down &&
+            docker-compose up -d --build
+          "
+
+      - name: Notify success
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendMessage \
+            -d chat_id=YOUR_ADMIN_CHAT_ID \
+            -d text="✅ Afro Trading Bot deployed successfully!"
